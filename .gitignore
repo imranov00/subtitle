@@ -1,0 +1,20 @@
+# Python
+backend/venv/
+__pycache__/
+*.py[cod]
+*$py.class
+.env
+
+# Node
+frontend/node_modules/
+frontend/dist/
+.DS_Store
+
+# Project Specific
+backend/data/
+backend/static/
+*.mp4
+*.wav
+*.srt
+*.ass
+*.vtt

@@ -1,0 +1,44 @@
+services:
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      REDIS_URL: redis://redis:6379/0
+      DATABASE_URL: sqlite:////app/data/app.db
+      CORS_ORIGINS: http://localhost:8000,http://127.0.0.1:8000
+    volumes:
+      - app-data:/app/data
+    depends_on:
+      - redis
+
+  worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: celery -A app.celery_app worker --loglevel=INFO --concurrency=1
+    environment:
+      REDIS_URL: redis://redis:6379/0
+      DATABASE_URL: sqlite:////app/data/app.db
+      WHISPER_MODEL: medium
+      WHISPER_DEVICE: cpu
+      WHISPER_COMPUTE_TYPE: int8
+    volumes:
+      - app-data:/app/data
+      - whisper-cache:/root/.cache
+    depends_on:
+      - redis
+
+volumes:
+  redis-data:
+  app-data:
+  whisper-cache:
